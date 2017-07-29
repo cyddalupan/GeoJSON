@@ -1,40 +1,29 @@
 var app = angular.module('app',[]);
 
-app.controller('mainController', function($scope,$timeout,$http) {
+app.controller('mainController', function($scope,$timeout,$http,$filter) {
 
 	$scope.citymap = [];
-	// var citymap = {
- //        Naga: {
- //            center: {lat: 13.696360, lng: 122.915039},
- //            intensity: 2714856,
- //            title: "tit_1",
- //            desc: "decs_1"
- //        },
- //        Manila: {
- //            center: {lat: 14.599512, lng: 120.984219},
- //            intensity: 405837,
- //            title: "tit_2",
- //            desc: "decs_2"
- //        },
- //        Apari: {
- //            center: {lat: 18.330736, lng: 121.267090},
- //            intensity: 3857799,
- //            title: "tit_3",
- //            desc: "decs_3"
- //        },
- //        Negros: {
- //            center: {lat: 9.673523, lng: 122.596436},
- //            mag: 603502,
- //            title: "tit_4",
- //            desc: "decs_4"
- //        }
- //    };
+	$scope.preloader_stop = 0;
+
+	$scope.mapblur = function(filterVal){
+		$('#map')
+		  .css('filter','blur('+filterVal+'px)')
+		  .css('webkitFilter','blur('+filterVal+'px)')
+		  .css('mozFilter','blur('+filterVal+'px)')
+		  .css('oFilter','blur('+filterVal+'px)')
+		  .css('msFilter','blur('+filterVal+'px)');
+		if(filterVal == 0)
+			$('.overlay-dark').fadeOut('slow');
+		else
+			$('.overlay-dark').fadeIn('slow');
+	}
+	//blur on load
+	$scope.mapblur(15);
 
     $scope.initMap = function(events) {
 
     	//Clean array format
 		angular.forEach(events.features, function(value, key) {
-			console.log(value);
 			$scope.ctmIn = [];
 			$scope.ctmIn['center'] = {
 				lat: value.geometry.coordinates[1],
@@ -42,18 +31,22 @@ app.controller('mainController', function($scope,$timeout,$http) {
 			};
 			$scope.ctmIn['mag'] = value.properties.mag;
 			$scope.ctmIn['title'] = value.properties.title;
-			$scope.ctmIn['desc'] = value.properties.title;
+
+			//layout
+			$scope.ctmIn['desc'] = "<sup>"+$filter('date')(value.properties.time, 'longDate')+"</sup>";
+			$scope.ctmIn['desc'] += "<h5>"+value.properties.title+"</h5>";
+			$scope.ctmIn['desc'] += "<strong>Depth</strong>: "+value.geometry.coordinates[2]+"<br>";
+			$scope.ctmIn['desc'] += "<strong>Magnitude</strong>: "+value.properties.mag+"<br>";
+			$scope.ctmIn['desc'] += "<strong>Location</strong>: "+value.properties.place+"<br>";
 
 			$scope.citymap[value.id] = $scope.ctmIn;
 		});
 
-		console.log($scope.citymap);
-
-        // Create the map.
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 6,
-          center: {lat: 12.500305, lng: 121.958687},
-          mapTypeId: 'terrain'
+        // Show the map and pearl in middle.
+        map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 6,
+			center: {lat: 12.500305, lng: 121.958687},
+			mapTypeId: 'terrain'
         });
 
         // Construct the circle for each value in citymap.
@@ -63,13 +56,14 @@ app.controller('mainController', function($scope,$timeout,$http) {
             var cityCircle = new google.maps.Circle({
                 strokeColor: 'red',
                 strokeOpacity: 0.25,
-                strokeWeight: 10,
+                strokeWeight: ($scope.citymap[earthquake].mag*3),
                 fillColor: 'black',
                 fillOpacity: 0.4,
                 map: map,
                 center: $scope.citymap[earthquake].center,
                 radius: Math.pow($scope.citymap[earthquake].mag,6)
             });
+
             var marker = new google.maps.Marker({
                 position: $scope.citymap[earthquake].center,
                 icon: "img/pin.png",
@@ -78,7 +72,7 @@ app.controller('mainController', function($scope,$timeout,$http) {
             });
 
             var infowindow = new google.maps.InfoWindow({
-                maxWidth: 200
+                maxWidth: 300
             });
 
             var content = $scope.citymap[earthquake].desc;
@@ -93,6 +87,7 @@ app.controller('mainController', function($scope,$timeout,$http) {
     }
 
     $scope.get_json = function(){
+
 		$http({
 			method: 'GET',
 			url: 'https://earthquake.usgs.gov/fdsnws/event/1/query',
@@ -114,6 +109,43 @@ app.controller('mainController', function($scope,$timeout,$http) {
 		});
     }
 
+    $scope.submitDate = function(){
+    	alert($('.start-date-picker').datepicker('getDate'));
+    	alert($('.end-date-picker').datepicker('getDate'));
+    }
+
+    $scope.get_blank_map = function(){
+    	map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 6,
+			center: {lat: 12.500305, lng: 121.958687},
+			mapTypeId: 'terrain'
+        });
+    }
+
+    $scope.done_loading = function(){
+    	$('.geo_logo').animate({'margin-top':'3%'},1000,function(){
+			$('.date-picker-form').fadeIn("slow");
+		});
+    }
+
+	$scope.pre_loader = function(){
+		$('.geo_logo_mask').hide(1,function(){
+			$('.geo_logo_mask').animate({width:'toggle'},1000,function(){
+				if($scope.preloader_stop == 0)
+					$scope.pre_loader();
+				else
+					$scope.done_loading();
+			});
+		});
+	}
+	$scope.pre_loader();
+
+	$(window).on("load", function() {
+		$timeout(function(){
+			$scope.preloader_stop = 1;
+		},500);
+	});
+
     function loadScript(url, callback)
 	{
 	    // Adding the script tag to the head as suggested before
@@ -131,5 +163,8 @@ app.controller('mainController', function($scope,$timeout,$http) {
 	    head.appendChild(script);
 	}
 
-	loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyD2-JYz_IISnez8rUvd3M322k-nSx6m7WA', function(){ $scope.get_json(); });
+	$('.start-date-picker').datepicker({});
+	$('.end-date-picker').datepicker({});
+
+	loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyD2-JYz_IISnez8rUvd3M322k-nSx6m7WA', function(){ $scope.get_blank_map(); });
 });
