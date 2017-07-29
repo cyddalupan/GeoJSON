@@ -4,6 +4,9 @@ app.controller('mainController', function($scope,$timeout,$http,$filter) {
 
 	$scope.citymap = [];
 	$scope.preloader_stop = 0;
+	$scope.error_message = '';
+	$scope.start_date = '';
+	$scope.end_date = '';
 
 	$scope.mapblur = function(filterVal){
 		$('#map')
@@ -12,10 +15,13 @@ app.controller('mainController', function($scope,$timeout,$http,$filter) {
 		  .css('mozFilter','blur('+filterVal+'px)')
 		  .css('oFilter','blur('+filterVal+'px)')
 		  .css('msFilter','blur('+filterVal+'px)');
-		if(filterVal == 0)
+		if(filterVal == 0){
 			$('.overlay-dark').fadeOut('slow');
-		else
+			$('.ui-user').fadeOut('slow');
+		}else{
 			$('.overlay-dark').fadeIn('slow');
+			$('.ui-user').fadeIn('slow');
+		}
 	}
 	//blur on load
 	$scope.mapblur(15);
@@ -84,6 +90,9 @@ app.controller('mainController', function($scope,$timeout,$http,$filter) {
                 };
             })(marker,content,infowindow));  
         }
+
+        //
+		$scope.mapblur(0);
     }
 
     $scope.get_json = function(){
@@ -93,13 +102,16 @@ app.controller('mainController', function($scope,$timeout,$http,$filter) {
 			url: 'https://earthquake.usgs.gov/fdsnws/event/1/query',
 			params : {
 				'format':'geojson',
+				//Philippine area *start
 				'minlatitude': '4.553153',
 				'minlongitude':'115.444336',
 				'maxlatitude':'20.538935',
 				'maxlongitude':'130.825195',
-				'starttime':'1976-08-16',
-				'endtime':'1976-08-18',
-				'eventtype':'earthquake'
+				//Philippine area *end
+				'eventtype':'earthquake',
+				//user inputs
+				'starttime':$filter('date')($scope.start_date, 'yyyy-MM-dd'),
+				'endtime':$filter('date')($scope.end_date, 'yyyy-MM-dd')
 			}
 		}).then(function successCallback(response) {
 			//run map
@@ -109,9 +121,35 @@ app.controller('mainController', function($scope,$timeout,$http,$filter) {
 		});
     }
 
+    $scope.showErrorMsg = function(error_message){
+    	$scope.error_message = error_message;
+    	$('.error-container').show(1,function(){
+	    	$('.error-message').slideDown('fast',function(){
+	    		$timeout(function(){
+	    			$('.error-message').slideUp('fast',function(){
+	    				$('.error-container').hide(1);
+	    			});
+	    		},3000);
+	    	});
+    	});
+    }
+
     $scope.submitDate = function(){
-    	alert($('.start-date-picker').datepicker('getDate'));
-    	alert($('.end-date-picker').datepicker('getDate'));
+    	startDate = $('.start-date-picker').datepicker('getDate');
+    	endDate = $('.end-date-picker').datepicker('getDate');
+
+    	if(startDate == null || endDate  == null){
+    		$scope.showErrorMsg('Please select a date');
+    	}else{
+	    	if(endDate > startDate){
+				$scope.start_date = startDate;
+				$scope.end_date = endDate;
+				//
+				$scope.get_json();
+	    	}else{
+    			$scope.showErrorMsg("The end date must be greater than start date");
+	    	}
+    	}
     }
 
     $scope.get_blank_map = function(){

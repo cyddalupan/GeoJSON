@@ -11,7 +11,6 @@
         <!-- Favicon -->
         <link rel="icon" href="favicon.ico" type="image/x-icon">
         <!-- Bootstrap -->
-        <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-datepicker3.min.css" rel="stylesheet">
         <!-- Custom -->
@@ -26,6 +25,12 @@
     </head>
     <body ng-controller="mainController">
 
+        <div class="error-container">
+            <div class="alert alert-danger error-message" role="alert">
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                {{error_message}}
+            </div>
+        </div>
         <div class="ui-user">
             <div class="geo_logo">
                 <div class="geo_logo_mask">
@@ -48,7 +53,6 @@
                 <button type="button" class="btn btn-default btn-lg btn-block submit-date-picker" ng-click="submitDate()">Submit</button>
                 <br>
             </div>
-
         </div>
         <div class="overlay-dark"></div>
         <div id="map"></div>
