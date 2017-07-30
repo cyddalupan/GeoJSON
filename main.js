@@ -18,16 +18,18 @@ app.controller('mainController', function($scope,$timeout,$http,$filter) {
 		if(filterVal == 0){
 			$('.overlay-dark').fadeOut('slow');
 			$('.ui-user').fadeOut('slow');
+			$('.back-to-form').fadeIn('fast');
 		}else{
 			$('.overlay-dark').fadeIn('slow');
 			$('.ui-user').fadeIn('slow');
+			$('.back-to-form').fadeOut('fast');
 		}
 	}
 	//blur on load
 	$scope.mapblur(15);
 
     $scope.initMap = function(events) {
-
+    	$scope.citymap = [];
     	//Clean array format
 		angular.forEach(events.features, function(value, key) {
 			$scope.ctmIn = [];
