@@ -1,76 +1,12 @@
+/* ===Global=== */
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
 }
-#map {
-    height: 100%;
-    position: relative;
-}
-.overlay-dark{
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 1;
-    opacity: 0.5;
-    filter: alpha(opacity=50);
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
-    display: none;
-}
-.ui-user{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    z-index: 3;
-}
 
-.geo_logo{
-    position: relative;
-    width: 300px;
-    height: 228px;
-    margin: auto;
-    margin-top: 20%;
-}
-.geo_logo .geo_logo_mask{
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    bottom: 0px;
-    height: 228px;
-    width: 300px;
-    overflow: hidden;
-}
-.geo_logo .geo_logo_mask img{
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    height: 228px;
-}
-
-.date-picker-form{
-    display: none;
-}
-
-.dp-style{
-    width: 242px;
-    margin: auto;
-    background: #fff;
-    padding: 15px;
-    border-radius: 5px;
-}
-
-.lead{
-    color: #fff;
-}
-
-.submit-date-picker{
-    max-width: 400px;
-    margin: auto;
-}
-
-.error-container{
+/* ===Show Error Message=== */
+#error-container{
     position: fixed;
     top: 0;
     left: 0;
@@ -81,14 +17,84 @@ html, body {
     height: 53px;
     display: none;
 }
-
-.error-message{
+#error-container .error-message{
     display: none;
 }
 
-.back-to-form{
+/* ===User Form UI=== */
+#ui-user{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    z-index: 3;
+}
+
+#ui-user .geo_logo{
+    position: relative;
+    width: 300px;
+    height: 228px;
+    margin: auto;
+    margin-top: 20%;
+}
+#ui-user .geo_logo .geo_logo_mask{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    height: 228px;
+    width: 300px;
+    overflow: hidden;
+}
+#ui-user .geo_logo .geo_logo_mask img{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 228px;
+}
+
+/* ===Date Picker Style=== */
+#date-picker-form{
+    display: none;
+}
+#date-picker-form .lead{
+    color: #fff;
+}
+#date-picker-form .dp-style{
+    width: 242px;
+    margin: auto;
+    background: #fff;
+    padding: 15px;
+    border-radius: 5px;
+}
+#date-picker-form .submit-date-picker{
+    max-width: 400px;
+    margin: auto;
+}
+
+/* ===Dark Transparent Filler=== */
+#overlay-dark{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 1;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    display: none;
+}
+
+/* ===Back to ui button=== */
+#back-to-form{
     position: fixed;
     top: 10px;
     right: 10px;
     z-index: 1;
+}
+
+/* ===Google Map Style=== */
+#map {
+    height: 100%;
+    position: relative;
 }
